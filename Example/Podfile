@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'Pigeon_Example' do
+  pod 'Pigeon', :path => '../'
+
+  target 'Pigeon_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
