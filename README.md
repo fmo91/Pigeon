@@ -138,7 +138,7 @@ struct User: Codable, Identifiable {
 Pigeon provides a way to fetching data using the fetcher every N seconds. That's achieved with the `pollingBehavior` property in the `Query` class. Default is `.noPolling`. Let's see an example:
 
 ```swift
-@ObservedObject var users = Pigeon.Query<Void, [User]>(
+@ObservedObject var users = Query<Void, [User]>(
     key: .users,
     behavior: .startImmediately(()),
     pollingBehavior: .pollEvery(2),
