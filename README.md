@@ -93,6 +93,46 @@ struct UsersList: View {
 }
 ```
 
+## Queries and Query Consumers
+
+In addition to Queries, Pigeon has another type, `QueryConsumer<Response>` that is only generic on the response type and doesn't provide any kind of fetching capability, but just provides the capability to consume, and react to changes in Queries with the same `QueryKey` that it subscribes to.
+
+```swift
+struct ContentView: View {
+    @ObservedObject var users = Query<Void, [User]>(
+        key: QueryKey(value: "users"),
+        behavior: .startImmediately(()),
+        fetcher: {
+            URLSession.shared
+                .dataTaskPublisher(for: URL(string: "https://jsonplaceholder.typicode.com/users/")!)
+                .map(\.data)
+                .decode(type: [User].self, decoder: JSONDecoder())
+                .receive(on: DispatchQueue.main)
+                .eraseToAnyPublisher()
+        }
+    )
+    
+    var body: some View {
+        UsersList()
+    }
+}
+
+struct UsersList: View {
+    @ObservedObject var users = QueryConsumer<[User]>(key: QueryKey(value: "users"))
+    
+    var body: some View {
+        List(users.state.value ?? []) { user in
+            Text(user.name)
+        }
+    }
+}
+
+struct User: Codable, Identifiable {
+    let id: Int
+    let name: String
+}
+```
+
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
