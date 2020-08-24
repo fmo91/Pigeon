@@ -161,7 +161,7 @@ Pigeon provides a way to fetching data using the fetcher every N seconds. That's
 
 ```swift
 @ObservedObject var users = Query<Void, [User]>(
-    key: .users,
+    key: QueryKey(value: "users"),
     behavior: .startImmediately(()),
     pollingBehavior: .pollEvery(2),
     fetcher: {
@@ -177,11 +177,56 @@ Pigeon provides a way to fetching data using the fetcher every N seconds. That's
 
 That query will trigger its fetcher every 2 seconds.
 
+## Mutations
+
+In addition to allow queries, Pigeon also provides a way to mutate server data, and force to refetch affected queries.
+
+```swift
+@ObservedObject var sampleMutation = Mutation<Int, User> { (number) -> AnyPublisher<User, Error> in
+    Just(User(id: number, name: "Pepe"))
+        .tryMap({ $0 })
+        .eraseToAnyPublisher()
+}
+
+// ...
+
+sampleMutation.execute(with: 10) { (user: User, invalidate) in
+    // Invalidate triggers a new query on the "users" key
+    invalidate(QueryKey(value: "users"), .lastData)
+}
+```
+
+## Convenient keys
+
+You can also define more convenient keys by extending `QueryKey` like this:
+
+```swift
+extension QueryKey {
+    static let users: QueryKey = QueryKey(value: "users")
+}
+```
+
+So then you can use it like this:
+
+```swift
+struct UsersList: View {
+    @ObservedObject var users = QueryConsumer<[User]>(key: .users)
+    
+    var body: some View {
+        List(users.state.value ?? []) { user in
+            Text(user.name)
+        }
+    }
+}
+```
+
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
 ## Requirements
+
+Pigeon works with SwiftUI and UIKit as well. As it has a dependency in Combine, it required a minimum iOS version of 13.0.
 
 ## Installation
 
