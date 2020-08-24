@@ -133,6 +133,28 @@ struct User: Codable, Identifiable {
 }
 ```
 
+## Polling
+
+Pigeon provides a way to fetching data using the fetcher every N seconds. That's achieved with the `pollingBehavior` property in the `Query` class. Default is `.noPolling`. Let's see an example:
+
+```swift
+@ObservedObject var users = Pigeon.Query<Void, [User]>(
+    key: .users,
+    behavior: .startImmediately(()),
+    pollingBehavior: .pollEvery(2),
+    fetcher: {
+        URLSession.shared
+            .dataTaskPublisher(for: URL(string: "https://jsonplaceholder.typicode.com/users")!)
+            .map(\.data)
+            .decode(type: [User].self, decoder: JSONDecoder())
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
+    }
+)
+```
+
+That query will trigger its fetcher every 2 seconds.
+
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
