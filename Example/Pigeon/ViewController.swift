@@ -53,6 +53,15 @@ class ViewController: UIViewController {
             }
         }.store(in: &cancellables)
         
+        let mutate = Mutation<Int, User> { (number) -> AnyPublisher<User, Error> in
+            Just(User(id: number, name: "Pepe"))
+                .tryMap({ $0 })
+                .eraseToAnyPublisher()
+        }
+        
+        mutate.execute(with: 10) { (user: User, invalidate) in
+            invalidate(.users, .lastData)
+        }
     }
 
     override func didReceiveMemoryWarning() {

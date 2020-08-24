@@ -25,7 +25,7 @@ public final class Mutation<Request, Response>: ObservableObject {
         with request: Request,
         onSuccess: @escaping (
             Response,
-            (QueryKey, Any?) -> Void
+            (QueryKey, QueryInvalidator.Parameters) -> Void
         ) -> Void = { _, _ in }
     ) {
         state = .loading

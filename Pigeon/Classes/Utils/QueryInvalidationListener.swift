@@ -14,11 +14,13 @@ public protocol QueryInvalidationListener {
 }
 
 public extension QueryInvalidationListener {
-    func listenQueryInvalidation(for key: QueryKey) -> AnyPublisher<Request, Never> {
+    func listenQueryInvalidation(for key: QueryKey) -> AnyPublisher<QueryInvalidator.TypedParameters<Request>, Never> {
         NotificationCenter.default.publisher(for: key.invalidationNotificationName)
             .map(\.object)
-            .filter { $0 is Request }
-            .map { $0 as! Request }
+            .map { ($0 as? QueryInvalidator.Parameters)?
+                .toTypedParameters(of: Request.self) }
+            .filter({ $0 != nil })
+            .map { $0! }
             .eraseToAnyPublisher()
     }
 }

@@ -26,6 +26,7 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryCac
     private let pollingBehavior: PollingBehavior
     private let cache: QueryCacheType
     private let fetcher: QueryFetcher
+    private var lastRequest: Request?
     private var cancellables = Set<AnyCancellable>()
     private var timerCancellables = Set<AnyCancellable>()
     
@@ -48,8 +49,15 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryCac
             .store(in: &cancellables)
         
         listenQueryInvalidation(for: key)
-            .sink { (request: Request) in
-                self.refetch(request: request)
+            .sink { (parameters: QueryInvalidator.TypedParameters<Request>) in
+                switch parameters {
+                case .lastData:
+                    if let lastRequest = self.lastRequest {
+                        self.refetch(request: lastRequest)
+                    }
+                case let .newData(newRequest):
+                    self.refetch(request: newRequest)
+                }
             }
             .store(in: &cancellables)
     }
@@ -67,6 +75,7 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryCac
     }
     
     public func refetch(request: Request) {
+        lastRequest = request
         timerCancellables.forEach({ $0.cancel() })
         cache.invalidate(for: key)
         NotificationCenter.default.post(

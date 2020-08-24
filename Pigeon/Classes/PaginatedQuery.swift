@@ -43,8 +43,15 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
             .store(in: &cancellables)
         
         listenQueryInvalidation(for: key)
-            .sink { (request: Request) in
-                self.refetchAll(request: request)
+            .sink { (parameters: QueryInvalidator.TypedParameters<Request>) in
+                switch parameters {
+                case .lastData:
+                    if let lastRequest = self.lastRequest {
+                        self.refetchAll(request: lastRequest)
+                    }
+                case let .newData(newRequest):
+                    self.refetchAll(request: newRequest)
+                }
             }
             .store(in: &cancellables)
     }

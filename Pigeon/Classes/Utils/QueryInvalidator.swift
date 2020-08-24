@@ -9,10 +9,33 @@
 import Foundation
 
 public struct QueryInvalidator {
-    public func invalidateQuery(for key: QueryKey, with request: Any?) {
+    public enum Parameters {
+        case lastData
+        case newData(Any)
+        
+        func toTypedParameters<T>(of type: T.Type) -> TypedParameters<T>? {
+            switch self {
+            case .lastData:
+                return .lastData
+            case let .newData(newData):
+                if let typedNewData = newData as? T {
+                    return .newData(typedNewData)
+                } else {
+                    return nil
+                }
+            }
+        }
+    }
+    
+    public enum TypedParameters<T> {
+        case lastData
+        case newData(T)
+    }
+    
+    public func invalidateQuery(for key: QueryKey, with parameters: Parameters) {
         NotificationCenter.default.post(
             name: key.invalidationNotificationName,
-            object: request
+            object: parameters
         )
     }
 }
