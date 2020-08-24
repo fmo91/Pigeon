@@ -67,6 +67,27 @@ struct UsersList: View {
 3. Data is cached by default in Pigeon. The `QueryKey` is a simple wrapper around the `String` that identifies our piece of state.
 4. `Query` also receives a `fetcher`, which is a function that we have to define. `fetcher` takes the `Request` and returns a Combine `Publisher` holding the `Response`. Note that we can put whatever custom login in the `fetcher`. In this case, we use `URLSession` to get an array of `User` from an API.
 5. `Query` contains a state, that is either: `none` (if it just starts), `loading` (if the fetcher is running), `failed` (which also contains an `Error`), or `succeed` (which also contains the `Response`). `value` is just a convenience property that returns a `Response` in case it exists, or `nil` otherwise.
+
+```swift
+// ...
+    var body: some View {
+        // 5
+        switch users.state {
+            case .none, .loading:
+                return AnyView(Text("Loading..."))
+            case .failed:
+                return AnyView(Text("Oops..."))
+            case let .succeed(users):
+                return AnyView(
+                    List(users) { user in
+                        Text(user.name)
+                    }
+                )
+        }
+    }
+// ...
+```
+
 6. In this example, we are firing our `Query` manually, using `refetch`. However, we can also configure our `Query` so it fires immediately like this:
 
 ```swift
