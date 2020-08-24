@@ -1,0 +1,16 @@
+PODS:
+  - Pigeon (0.1.0)
+
+DEPENDENCIES:
+  - Pigeon (from `../`)
+
+EXTERNAL SOURCES:
+  Pigeon:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  Pigeon: 6f90cd65c392289cd087859bf6fcc30ac3a260a1
+
+PODFILE CHECKSUM: d484b1d7957e4b086f43b3b7c4b05fdc862a7fb2
+
+COCOAPODS: 1.9.3

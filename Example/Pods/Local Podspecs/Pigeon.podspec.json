@@ -1,0 +1,22 @@
+{
+  "name": "Pigeon",
+  "version": "0.1.0",
+  "summary": "A short description of Pigeon.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/fmo91/Pigeon",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "fmo91": "ortizfernandomartin@gmail.com"
+  },
+  "source": {
+    "git": "https://github.com/fmo91/Pigeon.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "13.0"
+  },
+  "source_files": "Pigeon/Classes/**/*"
+}

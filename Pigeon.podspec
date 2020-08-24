@@ -9,34 +9,17 @@
 Pod::Spec.new do |s|
   s.name             = 'Pigeon'
   s.version          = '0.1.0'
-  s.summary          = 'A short description of Pigeon.'
-
-# This description is used to generate tags and improve search results.
-#   * Think: What does it do? Why did you write it? What is the focus?
-#   * Try to keep it short, snappy and to the point.
-#   * Write the description between the DESC delimiters below.
-#   * Finally, don't worry about the indent, CocoaPods strips it!
-
+  s.summary          = 'Server state management for UIKit and SwiftUI, heavily inspired by React Query.'
   s.description      = <<-DESC
-TODO: Add long description of the pod here.
+  Pigeon is a server side state management library that is agnostic on how you fetch your data.
+  It is inspired by React Query and works with both, SwiftUI and UIKit, and relies heavily in iOS native libraries and Combine.
                        DESC
-
   s.homepage         = 'https://github.com/fmo91/Pigeon'
-  # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'fmo91' => 'ortizfernandomartin@gmail.com' }
   s.source           = { :git => 'https://github.com/fmo91/Pigeon.git', :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
-
-  s.ios.deployment_target = '8.0'
-
+  s.social_media_url = 'https://twitter.com/fmortiz_91'
+  s.ios.deployment_target = '13.0'
   s.source_files = 'Pigeon/Classes/**/*'
-  
-  # s.resource_bundles = {
-  #   'Pigeon' => ['Pigeon/Assets/*.png']
-  # }
-
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
+  s.frameworks = 'Combine'
 end

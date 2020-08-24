@@ -1,0 +1,6 @@
+framework module Pigeon {
+  umbrella header "Pigeon-umbrella.h"
+
+  export *
+  module * { export * }
+}
