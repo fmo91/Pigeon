@@ -84,7 +84,7 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
         self.currentPage = page
         self.cache.invalidate(for: currentPage.asQueryKey)
         NotificationCenter.default.post(
-            name: self.currentPage.notificationName,
+            name: self.currentPage.newDataNotificationName,
             object: nil
         )
         state = .loading
@@ -100,7 +100,7 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
                 },
                 receiveValue: { (response: Response) in
                     NotificationCenter.default.post(
-                        name: self.currentPage.notificationName,
+                        name: self.currentPage.newDataNotificationName,
                         object: response
                     )
                     self.cache.save(response, for: self.currentPage.asQueryKey)

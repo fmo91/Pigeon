@@ -28,9 +28,9 @@ public struct QueryKey: Hashable, QueryKeyType {
     }
 }
 
-public extension QueryKeyType {
-    var notificationName: Notification.Name {
-        Notification.Name("\(queryKeyValue)_notification")
+internal extension QueryKeyType {
+    var newDataNotificationName: Notification.Name {
+        Notification.Name("\(queryKeyValue)_notification_new_data")
     }
     var invalidationNotificationName: Notification.Name {
         Notification.Name("\(queryKeyValue)_notification_invalidation")

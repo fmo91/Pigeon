@@ -15,7 +15,7 @@ public protocol QueryCacheListener {
 
 public extension QueryCacheListener {
     func listenQueryCache(for key: QueryKey) -> AnyPublisher<QueryState<Response>, Never> {
-        NotificationCenter.default.publisher(for: key.notificationName)
+        NotificationCenter.default.publisher(for: key.newDataNotificationName)
             .map(\.object)
             .filter { $0 is Response }
             .map { .succeed($0 as! Response) }

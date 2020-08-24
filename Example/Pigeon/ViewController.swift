@@ -25,6 +25,8 @@ class ViewController: UIViewController {
     
     var users = Pigeon.Query<Void, [User]>(
         key: .users,
+        behavior: .startImmediately(()),
+        pollingBehavior: .pollEvery(2),
         fetcher: {
             URLSession.shared
                 .dataTaskPublisher(for: URL(string: "https://jsonplaceholder.typicode.com/users")!)
@@ -51,7 +53,6 @@ class ViewController: UIViewController {
             }
         }.store(in: &cancellables)
         
-        users.refetch(request: ())
     }
 
     override func didReceiveMemoryWarning() {
