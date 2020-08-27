@@ -8,9 +8,52 @@
 
 import UIKit
 import Pigeon
+import SwiftUI
 import Combine
 
-struct User: Codable {
+class ViewController: UIHostingController<ContentView> {
+    
+    init() {
+        super.init(rootView: ContentView())
+    }
+    
+    @objc required dynamic init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+}
+
+//
+
+typealias UsersQuery = Query<Void, [User]>
+
+struct ContentView: View {
+    @ObservedObject
+    private var users = UsersQuery(
+        key: .users,
+        behavior: .startImmediately(()),
+        fetcher: Fetchers.getUsers
+    )
+    
+    var body: some View {
+        UsersList()
+    }
+}
+
+struct UsersList: View {
+    @ObservedObject
+    private var users = UsersQuery.Consumer(key: .users)
+    
+    var body: some View {
+        List(users.state.value ?? []) { user in
+            Text(user.name)
+        }
+    }
+}
+
+//
+
+struct User: Codable, Identifiable {
     let id: Int
     let name: String
 }
@@ -19,55 +62,13 @@ extension QueryKey {
     static var users: QueryKey { QueryKey(value: "users") }
 }
 
-class ViewController: UIViewController {
-    
-    private var cancellables = Set<AnyCancellable>()
-    
-    var users = Pigeon.Query<Void, [User]>(
-        key: .users,
-        behavior: .startImmediately(()),
-        pollingBehavior: .pollEvery(2),
-        fetcher: {
-            URLSession.shared
-                .dataTaskPublisher(for: URL(string: "https://jsonplaceholder.typicode.com/users")!)
-                .map(\.data)
-                .decode(type: [User].self, decoder: JSONDecoder())
-                .receive(on: DispatchQueue.main)
-                .eraseToAnyPublisher()
-        }
-    )
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        users.$state.sink { (state: QueryState<[User]>) in
-            switch state {
-            case let .failed(error):
-                print("Oops! \(error)")
-            case .loading:
-                print("It is loading")
-            case .none:
-                print("This just starts...")
-            case let .succeed(users):
-                print(users)
-            }
-        }.store(in: &cancellables)
-        
-        let mutate = Mutation<Int, User> { (number) -> AnyPublisher<User, Error> in
-            Just(User(id: number, name: "Pepe"))
-                .tryMap({ $0 })
-                .eraseToAnyPublisher()
-        }
-        
-        mutate.execute(with: 10) { (user: User, invalidate) in
-            invalidate(.users, .lastData)
-        }
+enum Fetchers {
+    static func getUsers(request: Void) -> AnyPublisher<[User], Error> {
+        URLSession.shared
+            .dataTaskPublisher(for: URL(string: "https://jsonplaceholder.typicode.com/users")!)
+            .map(\.data)
+            .decode(type: [User].self, decoder: JSONDecoder())
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
 }
-

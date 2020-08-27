@@ -30,12 +30,28 @@ public struct QueryInvalidator {
     public enum TypedParameters<T> {
         case lastData
         case newData(T)
+        
+        func erased() -> Parameters {
+            switch self {
+            case .lastData:
+                return .lastData
+            case let .newData(newData):
+                return .newData(newData)
+            }
+        }
     }
     
     public func invalidateQuery(for key: QueryKey, with parameters: Parameters) {
         NotificationCenter.default.post(
             name: key.invalidationNotificationName,
             object: parameters
+        )
+    }
+    
+    public func invalidateQuery<T>(for key: QueryKey, with parameters: TypedParameters<T>) {
+        NotificationCenter.default.post(
+            name: key.invalidationNotificationName,
+            object: parameters.erased()
         )
     }
 }

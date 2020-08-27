@@ -9,20 +9,30 @@
 import Foundation
 import Combine
 
-public final class QueryConsumer<Response: Codable>: ObservableObject, QueryCacheListener {
-    public typealias State = QueryState<Response>
-    @Published public var state = State.none
-    private var cancellables = Set<AnyCancellable>()
-    
-    public init(
-        key: QueryKey,
-        cache: QueryCacheType = QueryCache.default
-    ) {
-        if let cachedResponse: Response = cache.get(for: key) {
-            state = .succeed(cachedResponse)
+extension Query {
+    public final class Consumer: ObservableObject, QueryCacheListener {
+        public typealias State = QueryState<Response>
+        private let key: QueryKey
+        private let query: Query<Request, Response>
+        public var state: State { query.state }
+        private var cancellables = Set<AnyCancellable>()
+        
+        public init(
+            key: QueryKey
+        ) {
+            self.key = key
+            self.query = QueryRegistry.shared.resolve(for: key)
+            
+            query.$state
+                .sink { _ in
+                    self.objectWillChange.send()
+                }
+                .store(in: &cancellables)
         }
-        listenQueryCache(for: key)
-            .assign(to: \.state, on: self)
-            .store(in: &cancellables)
+        
+        public func refetch(for parameters: QueryInvalidator.TypedParameters<Request>) {
+            QueryInvalidator()
+                .invalidateQuery(for: key, with: parameters)
+        }
     }
 }

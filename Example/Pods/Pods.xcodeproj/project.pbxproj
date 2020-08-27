@@ -28,6 +28,7 @@
 		C690B79F16544BB1E600E8AED1688C60 /* Pigeon-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 36488F557D7CA7C9CF32D5255921DE6C /* Pigeon-dummy.m */; };
 		E48BE0FB1FE4BBB47D75836395C38A0E /* QueryCacheType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5891DC50901D2F38BA3EC9EC2183E293 /* QueryCacheType.swift */; };
 		EC6E962FF9744A6B930D17AD1E125612 /* QueryConsumer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E843D6CB8604CC93F0FAA8331CE7ECF7 /* QueryConsumer.swift */; };
+		FA81FF2A24F7553D000087E6 /* QueryRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA81FF2924F7553D000087E6 /* QueryRegistry.swift */; };
 		FB9F6FB86EFDBE6AFD268FFCC333DF88 /* Mutation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D9FDCD182EEAC459E6513A94F95E2D /* Mutation.swift */; };
 /* End PBXBuildFile section */
 
@@ -93,6 +94,7 @@
 		E843D6CB8604CC93F0FAA8331CE7ECF7 /* QueryConsumer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = QueryConsumer.swift; path = Pigeon/Classes/QueryConsumer.swift; sourceTree = "<group>"; };
 		EBF46FDC1A43AA3F055AB20F283B6229 /* Pigeon-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pigeon-umbrella.h"; sourceTree = "<group>"; };
 		F65781FB74B9579F26125431EF325EFA /* Pigeon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Pigeon.release.xcconfig; sourceTree = "<group>"; };
+		FA81FF2924F7553D000087E6 /* QueryRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryRegistry.swift; sourceTree = "<group>"; };
 		FC76DCBE221FE22B6E338DF0F68D46CF /* Pods-Pigeon_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Pigeon_Example.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -215,6 +217,7 @@
 				331EA85B9B33D6037B04841411A69894 /* QueryInvalidator.swift */,
 				45092318240B5B8FF1F8507C313217DE /* QueryKey.swift */,
 				4CD190E75E56FA04BB8B96F733158EF2 /* QueryState.swift */,
+				FA81FF2924F7553D000087E6 /* QueryRegistry.swift */,
 			);
 			name = Utils;
 			path = Pigeon/Classes/Utils;
@@ -445,6 +448,7 @@
 				C41D4975F54AC0F10D161EA651740E7E /* Query.swift in Sources */,
 				51168F10649F3112C749A9C895322F99 /* QueryCacheListener.swift in Sources */,
 				E48BE0FB1FE4BBB47D75836395C38A0E /* QueryCacheType.swift in Sources */,
+				FA81FF2A24F7553D000087E6 /* QueryRegistry.swift in Sources */,
 				EC6E962FF9744A6B930D17AD1E125612 /* QueryConsumer.swift in Sources */,
 				B743F609C435A2080631CF5DEDA5D495 /* QueryInvalidationListener.swift in Sources */,
 				9F1C9F94FBB1335218747E97A6699328 /* QueryInvalidator.swift in Sources */,

@@ -60,6 +60,12 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryCac
                 }
             }
             .store(in: &cancellables)
+        
+        QueryRegistry.shared.register(self, for: key)
+    }
+    
+    deinit {
+        QueryRegistry.shared.unregister(for: key)
     }
     
     private func start(for behavior: FetchingBehavior) {
