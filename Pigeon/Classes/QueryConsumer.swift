@@ -15,6 +15,9 @@ extension Query {
         private let key: QueryKey
         private let query: Query<Request, Response>
         public var state: State { query.state }
+        public var statePublisher: Published<State>.Publisher {
+            return query.$state
+        }
         private var cancellables = Set<AnyCancellable>()
         
         public init(
