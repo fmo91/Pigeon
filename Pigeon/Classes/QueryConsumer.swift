@@ -18,6 +18,13 @@ extension Query {
         public var statePublisher: Published<State>.Publisher {
             return query.$state
         }
+        public var valuePublisher: AnyPublisher<Response, Never> {
+            query.$state
+                .map { $0.value }
+                .filter({ $0 != nil })
+                .map { $0! }
+                .eraseToAnyPublisher()
+        }
         private var cancellables = Set<AnyCancellable>()
         
         public init(

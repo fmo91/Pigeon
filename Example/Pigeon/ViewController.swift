@@ -26,6 +26,7 @@ class ViewController: UIHostingController<ContentView> {
 //
 
 typealias UsersQuery = Query<Void, [User]>
+typealias AlbumsQuery = Query<User, [Album]>
 
 struct ContentView: View {
     @ObservedObject
@@ -36,7 +37,9 @@ struct ContentView: View {
     )
     
     var body: some View {
-        UsersList()
+        NavigationView {
+            UsersList()
+        }
     }
 }
 
@@ -46,8 +49,38 @@ struct UsersList: View {
     
     var body: some View {
         List(users.state.value ?? []) { user in
-            Text(user.name)
+            NavigationLink(destination: AlbumsList(for: user)) {
+                Text(user.name)
+            }
         }
+        .navigationBarTitle("Users")
+        .onAppear {
+            self.users.refetch(for: .lastData)
+        }
+    }
+}
+
+struct AlbumsList: View {
+    let user: User
+    
+    @ObservedObject
+    private var albums: AlbumsQuery
+    
+    init(for user: User) {
+        self.user = user
+        
+        self.albums = AlbumsQuery(
+            key: .albums(for: user),
+            behavior: .startImmediately(user),
+            fetcher: Fetchers.getAlbums
+        )
+    }
+    
+    var body: some View {
+        List(albums.state.value ?? []) { album in
+            Text(album.title)
+        }
+        .navigationBarTitle("Albums")
     }
 }
 
@@ -58,8 +91,17 @@ struct User: Codable, Identifiable {
     let name: String
 }
 
+struct Album: Codable, Identifiable {
+    let id: Int
+    let title: String
+}
+
 extension QueryKey {
     static var users: QueryKey { QueryKey(value: "users") }
+    static func albums(for user: User) -> QueryKey {
+        QueryKey(value: "albums")
+            .appending(user.id.description)
+    }
 }
 
 enum Fetchers {
@@ -68,6 +110,14 @@ enum Fetchers {
             .dataTaskPublisher(for: URL(string: "https://jsonplaceholder.typicode.com/users")!)
             .map(\.data)
             .decode(type: [User].self, decoder: JSONDecoder())
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
+    }
+    static func getAlbums(request: User) -> AnyPublisher<[Album], Error> {
+        URLSession.shared
+            .dataTaskPublisher(for: URL(string: "https://jsonplaceholder.typicode.com/users/\(request.id)/albums")!)
+            .map(\.data)
+            .decode(type: [Album].self, decoder: JSONDecoder())
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }

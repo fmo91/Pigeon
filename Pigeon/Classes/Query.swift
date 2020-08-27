@@ -22,6 +22,13 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryCac
     public typealias QueryFetcher = (Request) -> AnyPublisher<Response, Error>
     
     @Published public var state = State.none
+    public var valuePublisher: AnyPublisher<Response, Never> {
+        $state
+            .map { $0.value }
+            .filter({ $0 != nil })
+            .map { $0! }
+            .eraseToAnyPublisher()
+    }
     private let key: QueryKey
     private let pollingBehavior: PollingBehavior
     private let cache: QueryCacheType
