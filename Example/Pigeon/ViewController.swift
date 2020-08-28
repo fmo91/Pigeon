@@ -14,6 +14,7 @@ import Combine
 class ViewController: UIHostingController<ContentView> {
     
     init() {
+        QueryCache.setDefault(.userDefaults)
         super.init(rootView: ContentView())
     }
     
@@ -33,6 +34,7 @@ struct ContentView: View {
     private var users = UsersQuery(
         key: .users,
         behavior: .startImmediately(()),
+        pollingBehavior: .pollEvery(20),
         fetcher: Fetchers.getUsers
     )
     
@@ -43,20 +45,35 @@ struct ContentView: View {
     }
 }
 
+final class UsersViewModel: ObservableObject {
+    private var usersQuery = UsersQuery.Consumer(key: .users)
+    
+    private var cancellables = Set<AnyCancellable>()
+    
+    var users: [User] {
+        usersQuery.state.value ?? []
+    }
+    
+    init() {
+        usersQuery.valuePublisher
+            .sink { (_) in
+                self.objectWillChange.send()
+            }
+            .store(in: &cancellables)
+    }
+}
+
 struct UsersList: View {
     @ObservedObject
-    private var users = UsersQuery.Consumer(key: .users)
+    private var viewModel = UsersViewModel()
     
     var body: some View {
-        List(users.state.value ?? []) { user in
+        List(viewModel.users) { user in
             NavigationLink(destination: AlbumsList(for: user)) {
                 Text(user.name)
             }
         }
         .navigationBarTitle("Users")
-        .onAppear {
-            self.users.refetch(for: .lastData)
-        }
     }
 }
 

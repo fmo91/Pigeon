@@ -17,13 +17,21 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
     public typealias State = QueryState<Response>
     public typealias QueryFetcher = (Request, PageIdentifier) -> AnyPublisher<Response, Error>
     
-    @Published public var state = State.none
-    @Published public var currentPage: PageIdentifier
+    @Published private(set) public var state = State.none
+    @Published private(set) public var currentPage: PageIdentifier
+    public var valuePublisher: AnyPublisher<Response, Never> {
+        $state
+            .map { $0.value }
+            .filter({ $0 != nil })
+            .map { $0! }
+            .eraseToAnyPublisher()
+    }
     private let key: QueryKey
     private let cache: QueryCacheType
     private let fetcher: QueryFetcher
     private var lastRequest: Request?
     private var cancellables = Set<AnyCancellable>()
+    private var timerCancellables = Set<AnyCancellable>()
     
     public init(
         key: QueryKey,
@@ -54,6 +62,8 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
                 }
             }
             .store(in: &cancellables)
+        
+        QueryRegistry.shared.register(self, for: key)
     }
     
     private func start(for behavior: FetchingBehavior) {
