@@ -14,6 +14,15 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
+		FABE435324F891F400AEED7B /* Networking.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE435224F891F400AEED7B /* Networking.swift */; };
+		FABE435524F8941300AEED7B /* CardRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE435424F8941300AEED7B /* CardRequest.swift */; };
+		FABE435924F8947000AEED7B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE435824F8947000AEED7B /* ContentView.swift */; };
+		FABE435D24F894AC00AEED7B /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE435C24F894AC00AEED7B /* Card.swift */; };
+		FABE436024F8952000AEED7B /* CardsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE435F24F8952000AEED7B /* CardsList.swift */; };
+		FABE436224F896FF00AEED7B /* CardsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE436124F896FF00AEED7B /* CardsResponse.swift */; };
+		FABE436524F8986600AEED7B /* CardDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE436424F8986600AEED7B /* CardDetailView.swift */; };
+		FABE436724F898F400AEED7B /* CardDetailResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE436624F898F400AEED7B /* CardDetailResponse.swift */; };
+		FABE436924F8990D00AEED7B /* CardDetailRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE436824F8990D00AEED7B /* CardDetailRequest.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +54,15 @@
 		A4DD3D723B1C32207C53EDDB /* Pods_Pigeon_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Pigeon_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9CE96B48ED2AA5E938D62E4 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		D610C2ED6388B51EA21EB59D /* Pigeon.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Pigeon.podspec; path = ../Pigeon.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		FABE435224F891F400AEED7B /* Networking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Networking.swift; sourceTree = "<group>"; };
+		FABE435424F8941300AEED7B /* CardRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardRequest.swift; sourceTree = "<group>"; };
+		FABE435824F8947000AEED7B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		FABE435C24F894AC00AEED7B /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
+		FABE435F24F8952000AEED7B /* CardsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardsList.swift; sourceTree = "<group>"; };
+		FABE436124F896FF00AEED7B /* CardsResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardsResponse.swift; sourceTree = "<group>"; };
+		FABE436424F8986600AEED7B /* CardDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardDetailView.swift; sourceTree = "<group>"; };
+		FABE436624F898F400AEED7B /* CardDetailResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardDetailResponse.swift; sourceTree = "<group>"; };
+		FABE436824F8990D00AEED7B /* CardDetailRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardDetailRequest.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +109,8 @@
 		607FACD21AFB9204008FA782 /* Example for Pigeon */ = {
 			isa = PBXGroup;
 			children = (
+				FABE435124F891E000AEED7B /* Data */,
+				FABE435624F8945000AEED7B /* Application */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
@@ -154,6 +174,69 @@
 				7E0405C9A0A1A1A35CB2662D /* Pods_Pigeon_Tests.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		FABE435124F891E000AEED7B /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				FABE435B24F894A500AEED7B /* Model */,
+				FABE435A24F8949E00AEED7B /* Networking */,
+			);
+			name = Data;
+			sourceTree = "<group>";
+		};
+		FABE435624F8945000AEED7B /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				FABE435724F8946900AEED7B /* Base */,
+				FABE435E24F8951400AEED7B /* Cards List */,
+				FABE436324F8985700AEED7B /* Card Detail */,
+			);
+			name = Application;
+			sourceTree = "<group>";
+		};
+		FABE435724F8946900AEED7B /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				FABE435824F8947000AEED7B /* ContentView.swift */,
+			);
+			name = Base;
+			sourceTree = "<group>";
+		};
+		FABE435A24F8949E00AEED7B /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				FABE435224F891F400AEED7B /* Networking.swift */,
+				FABE435424F8941300AEED7B /* CardRequest.swift */,
+				FABE436824F8990D00AEED7B /* CardDetailRequest.swift */,
+			);
+			name = Networking;
+			sourceTree = "<group>";
+		};
+		FABE435B24F894A500AEED7B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				FABE435C24F894AC00AEED7B /* Card.swift */,
+				FABE436124F896FF00AEED7B /* CardsResponse.swift */,
+				FABE436624F898F400AEED7B /* CardDetailResponse.swift */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		FABE435E24F8951400AEED7B /* Cards List */ = {
+			isa = PBXGroup;
+			children = (
+				FABE435F24F8952000AEED7B /* CardsList.swift */,
+			);
+			name = "Cards List";
+			sourceTree = "<group>";
+		};
+		FABE436324F8985700AEED7B /* Card Detail */ = {
+			isa = PBXGroup;
+			children = (
+				FABE436424F8986600AEED7B /* CardDetailView.swift */,
+			);
+			name = "Card Detail";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -328,8 +411,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FABE436524F8986600AEED7B /* CardDetailView.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
+				FABE435D24F894AC00AEED7B /* Card.swift in Sources */,
+				FABE436924F8990D00AEED7B /* CardDetailRequest.swift in Sources */,
+				FABE436224F896FF00AEED7B /* CardsResponse.swift in Sources */,
+				FABE435924F8947000AEED7B /* ContentView.swift in Sources */,
+				FABE436724F898F400AEED7B /* CardDetailResponse.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
+				FABE436024F8952000AEED7B /* CardsList.swift in Sources */,
+				FABE435324F891F400AEED7B /* Networking.swift in Sources */,
+				FABE435524F8941300AEED7B /* CardRequest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
