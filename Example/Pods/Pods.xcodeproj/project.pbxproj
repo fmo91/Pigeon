@@ -29,6 +29,7 @@
 		E48BE0FB1FE4BBB47D75836395C38A0E /* QueryCacheType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5891DC50901D2F38BA3EC9EC2183E293 /* QueryCacheType.swift */; };
 		EC6E962FF9744A6B930D17AD1E125612 /* QueryConsumer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E843D6CB8604CC93F0FAA8331CE7ECF7 /* QueryConsumer.swift */; };
 		FA81FF2A24F7553D000087E6 /* QueryRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA81FF2924F7553D000087E6 /* QueryRegistry.swift */; };
+		FABE436B24F89EFC00AEED7B /* QueryRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE436A24F89EFC00AEED7B /* QueryRenderer.swift */; };
 		FB9F6FB86EFDBE6AFD268FFCC333DF88 /* Mutation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D9FDCD182EEAC459E6513A94F95E2D /* Mutation.swift */; };
 /* End PBXBuildFile section */
 
@@ -95,6 +96,7 @@
 		EBF46FDC1A43AA3F055AB20F283B6229 /* Pigeon-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pigeon-umbrella.h"; sourceTree = "<group>"; };
 		F65781FB74B9579F26125431EF325EFA /* Pigeon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Pigeon.release.xcconfig; sourceTree = "<group>"; };
 		FA81FF2924F7553D000087E6 /* QueryRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryRegistry.swift; sourceTree = "<group>"; };
+		FABE436A24F89EFC00AEED7B /* QueryRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryRenderer.swift; sourceTree = "<group>"; };
 		FC76DCBE221FE22B6E338DF0F68D46CF /* Pods-Pigeon_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-Pigeon_Example.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -129,6 +131,7 @@
 		0191E4643D78B137EF9FF0EDF5077233 /* Pigeon */ = {
 			isa = PBXGroup;
 			children = (
+				FABE436A24F89EFC00AEED7B /* QueryRenderer.swift */,
 				C3D9FDCD182EEAC459E6513A94F95E2D /* Mutation.swift */,
 				882D9B21602F3867C8BA2596342CB144 /* PaginatedQuery.swift */,
 				BD0A78292C5563992C99E1E0CB7D0F69 /* Query.swift */,
@@ -451,6 +454,7 @@
 				FA81FF2A24F7553D000087E6 /* QueryRegistry.swift in Sources */,
 				EC6E962FF9744A6B930D17AD1E125612 /* QueryConsumer.swift in Sources */,
 				B743F609C435A2080631CF5DEDA5D495 /* QueryInvalidationListener.swift in Sources */,
+				FABE436B24F89EFC00AEED7B /* QueryRenderer.swift in Sources */,
 				9F1C9F94FBB1335218747E97A6699328 /* QueryInvalidator.swift in Sources */,
 				3D2C3D1E7CB62EBD3E8FB0FC4D1F91B5 /* QueryKey.swift in Sources */,
 				25EC2FA8EB65F1FB4A5D156F7A7CAF54 /* QueryState.swift in Sources */,

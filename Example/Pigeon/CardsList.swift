@@ -21,25 +21,29 @@ struct CardsList: View {
         }
     )
     
+    let renderer = CardsListRenderer()
+    
     var body: some View {
-        content
+        renderer.view(for: cards.state)
             .navigationBarTitle("Cards")
     }
+}
+
+// MARK: - QueryRenderer -
+struct CardsListRenderer: QueryRenderer {
+    var loadingView: some View {
+        Text("Loading...")
+    }
     
-    var content: some View {
-        switch cards.state {
-        case .none, .loading:
-            return AnyView(Text("Loading"))
-        case .failed:
-            return AnyView(Text("It failed"))
-        case let .succeed(cards):
-            return AnyView (
-                List(cards) { card in
-                    NavigationLink(destination: CardDetailView(id: card.id)) {
-                        Text(card.name)
-                    }
-                }
-            )
+    func failureView(for failure: Error) -> some View {
+        Text("Failed!")
+    }
+    
+    func successView(for response: [Card]) -> some View {
+        List(response) { card in
+            NavigationLink(destination: CardDetailView(id: card.id)) {
+                Text(card.name)
+            }
         }
     }
 }
