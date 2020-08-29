@@ -42,8 +42,8 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryInv
         key: QueryKey,
         behavior: FetchingBehavior = .startWhenRequested,
         pollingBehavior: PollingBehavior = .noPolling,
-        cache: QueryCacheType = QueryCache.default,
-        cacheConfig: QueryCacheConfig = .default,
+        cache: QueryCacheType = QueryCache.global,
+        cacheConfig: QueryCacheConfig = .global,
         fetcher: @escaping QueryFetcher
     ) {
         self.key = key

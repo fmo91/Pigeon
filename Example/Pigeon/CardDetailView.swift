@@ -13,11 +13,16 @@ import Pigeon
 
 struct CardDetailView: View, QueryRenderer {
     @ObservedObject private var card: Query<String, Card>
+    private let id: String
     
     init(id: String) {
+        self.id = id
         card = Query<String, Card>(
             key: QueryKey(value: "card_detail_\(id)"),
-            behavior: .startImmediately(id),
+            cacheConfig: QueryCacheConfig(
+                invalidationPolicy: .notExpires,
+                usagePolicy: .useInsteadOfFetching
+            ),
             fetcher: { id in
                 CardDetailRequest(cardId: id)
                     .execute()
@@ -30,6 +35,9 @@ struct CardDetailView: View, QueryRenderer {
     var body: some View {
        view(for: card.state)
             .navigationBarTitle("Card Detail")
+            .onAppear {
+                self.card.refetch(request: self.id)
+            }
     }
     
     var loadingView: some View {

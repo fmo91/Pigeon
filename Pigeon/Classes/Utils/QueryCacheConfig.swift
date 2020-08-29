@@ -29,5 +29,8 @@ public struct QueryCacheConfig {
         self.usagePolicy = usagePolicy
     }
     
-    public static var `default`: QueryCacheConfig { .init() }
+    private(set) public static var global: QueryCacheConfig = .init()
+    public static func setGlobal(_ config: QueryCacheConfig) {
+        QueryCacheConfig.global = config
+    }
 }

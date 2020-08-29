@@ -28,6 +28,7 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
     }
     private let key: QueryKey
     private let cache: QueryCacheType
+    private let cacheConfig: QueryCacheConfig
     private let fetcher: QueryFetcher
     private var lastRequest: Request?
     private var cancellables = Set<AnyCancellable>()
@@ -36,12 +37,14 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
     public init(
         key: QueryKey,
         behavior: FetchingBehavior = .startWhenRequested,
-        cache: QueryCacheType = QueryCache.default,
+        cache: QueryCacheType = QueryCache.global,
+        cacheConfig: QueryCacheConfig = .global,
         fetcher: @escaping QueryFetcher
     ) {
         self.key = key
         self.currentPage = PageIdentifier.first
         self.cache = cache
+        self.cacheConfig = cacheConfig
         self.fetcher = fetcher
         
         start(for: behavior)

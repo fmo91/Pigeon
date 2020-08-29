@@ -26,9 +26,9 @@ public struct QueryCache {
         self.wrappedCache = wrappedCache
     }
     
-    private(set) public static var `default`: QueryCacheType = inMemory.wrappedCache
-    public static func setDefault(_ wrapper: QueryCache) {
-        QueryCache.default = wrapper.wrappedCache
+    private(set) public static var global: QueryCacheType = inMemory.wrappedCache
+    public static func setGlobal(_ wrapper: QueryCache) {
+        QueryCache.global = wrapper.wrappedCache
     }
     
     public static var inMemory: QueryCache { .init(wrappedCache: InMemoryQueryCache.shared) }

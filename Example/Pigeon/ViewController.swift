@@ -14,7 +14,7 @@ import Combine
 class ViewController: UIHostingController<ContentView> {
     
     init() {
-        QueryCache.setDefault(.userDefaults)
+        QueryCache.setGlobal(.userDefaults)
         super.init(rootView: ContentView())
     }
     
