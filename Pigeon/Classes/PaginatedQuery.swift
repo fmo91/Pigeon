@@ -9,7 +9,7 @@
 import Foundation
 import Combine
 
-public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Response: Codable>: ObservableObject, QueryInvalidationListener {
+public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Response: Codable & Sequence>: ObservableObject, QueryInvalidationListener {
     public enum FetchingBehavior {
         case startWhenRequested
         case startImmediately(Request)
@@ -17,6 +17,7 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
     public typealias State = QueryState<Response>
     public typealias QueryFetcher = (Request, PageIdentifier) -> AnyPublisher<Response, Error>
     
+    @Published private(set) public var items: [Response.Element] = []
     @Published private(set) public var state = State.idle
     @Published private(set) public var currentPage: PageIdentifier
     public var valuePublisher: AnyPublisher<Response, Never> {
@@ -48,6 +49,12 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
         self.fetcher = fetcher
         
         start(for: behavior)
+        
+        valuePublisher
+            .sink { (items) in
+                self.items.append(contentsOf: items)
+            }
+            .store(in: &cancellables)
         
         listenQueryInvalidation(for: key)
             .sink { (parameters: QueryInvalidator.TypedParameters<Request>) in
@@ -106,15 +113,16 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
     }
     
     public func refetchAll(request: Request) {
+        items = []
         currentPage = .first
         refetchCurrent(request: request)
     }
     
-    public func refetchCurrent(request: Request) {
+    private func refetchCurrent(request: Request) {
         self.refetch(request: request, page: currentPage)
     }
     
-    public func refetch(request: Request, page: PageIdentifier) {
+    private func refetch(request: Request, page: PageIdentifier) {
         self.lastRequest = request
         self.currentPage = page
         
