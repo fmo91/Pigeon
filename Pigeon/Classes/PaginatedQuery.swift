@@ -9,7 +9,7 @@
 import Foundation
 import Combine
 
-public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Response: Codable & Sequence>: ObservableObject, QueryInvalidationListener {
+public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Response: Codable & Sequence>: ObservableObject, QueryType, QueryInvalidationListener {
     public enum FetchingBehavior {
         case startWhenRequested
         case startImmediately(Request)

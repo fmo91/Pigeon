@@ -9,7 +9,7 @@
 import Foundation
 import Combine
 
-public final class Query<Request, Response: Codable>: ObservableObject, QueryInvalidationListener {
+public final class Query<Request, Response: Codable>: ObservableObject, QueryType, QueryInvalidationListener {
     public enum FetchingBehavior {
         case startWhenRequested
         case startImmediately(Request)
