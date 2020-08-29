@@ -9,7 +9,7 @@
 import Foundation
 import Combine
 
-public final class Query<Request, Response: Codable>: ObservableObject, QueryCacheListener, QueryInvalidationListener {
+public final class Query<Request, Response: Codable>: ObservableObject, QueryInvalidationListener {
     public enum FetchingBehavior {
         case startWhenRequested
         case startImmediately(Request)
@@ -21,7 +21,7 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryCac
     public typealias State = QueryState<Response>
     public typealias QueryFetcher = (Request) -> AnyPublisher<Response, Error>
     
-    @Published private(set) public var state = State.none
+    @Published private(set) public var state = State.idle
     public var valuePublisher: AnyPublisher<Response, Never> {
         $state
             .map { $0.value }
@@ -32,6 +32,7 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryCac
     private let key: QueryKey
     private let pollingBehavior: PollingBehavior
     private let cache: QueryCacheType
+    private let cacheConfig: QueryCacheConfig
     private let fetcher: QueryFetcher
     private var lastRequest: Request?
     private var cancellables = Set<AnyCancellable>()
@@ -42,18 +43,16 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryCac
         behavior: FetchingBehavior = .startWhenRequested,
         pollingBehavior: PollingBehavior = .noPolling,
         cache: QueryCacheType = QueryCache.default,
+        cacheConfig: QueryCacheConfig = .default,
         fetcher: @escaping QueryFetcher
     ) {
         self.key = key
         self.pollingBehavior = pollingBehavior
         self.cache = cache
+        self.cacheConfig = cacheConfig
         self.fetcher = fetcher
         
         start(for: behavior)
-        
-        listenQueryCache(for: key)
-            .assign(to: \.state, on: self)
-            .store(in: &cancellables)
         
         listenQueryInvalidation(for: key)
             .sink { (parameters: QueryInvalidator.TypedParameters<Request>) in
@@ -75,30 +74,31 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryCac
         QueryRegistry.shared.unregister(for: key)
     }
     
+    public func refetch(request: Request) {
+        lastRequest = request
+        timerCancellables.forEach({ $0.cancel() })
+        
+        if cacheConfig.usagePolicy == .useIfFetchFails {
+            state = .loading
+        }
+
+        performFetch(for: request)
+        startPollingIfNeeded(for: request)
+    }
+    
     private func start(for behavior: FetchingBehavior) {
         switch behavior {
         case .startWhenRequested:
-            if let cachedResponse: Response = self.cache.get(for: key) {
-                state = .succeed(cachedResponse)
+            if cacheConfig.usagePolicy == .useInsteadOfFetching
+                || cacheConfig.usagePolicy == .useAndThenFetch {
+                if let cachedResponse: Response = self.getCacheValueIfPossible() {
+                    state = .succeed(cachedResponse)
+                }
             }
             break
         case let .startImmediately(request):
             refetch(request: request)
         }
-    }
-    
-    public func refetch(request: Request) {
-        lastRequest = request
-        timerCancellables.forEach({ $0.cancel() })
-        cache.invalidate(for: key)
-        NotificationCenter.default.post(
-            name: self.key.newDataNotificationName,
-            object: nil
-        )
-        state = .loading
-
-        performFetch(for: request)
-        startPollingIfNeeded(for: request)
     }
     
     private func startPollingIfNeeded(for request: Request) {
@@ -116,24 +116,58 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryCac
         }
     }
     
+    private var isCacheValid: Bool {
+        return self.cache.isValueValid(
+            forKey: self.key,
+            timestamp: Date(),
+            andInvalidationPolicy: self.cacheConfig.invalidationPolicy
+        )
+    }
+    
+    private func getCacheValueIfPossible() -> Response? {
+        if isCacheValid {
+           return self.cache.get(for: self.key)
+        } else {
+            return nil
+        }
+    }
+    
     private func performFetch(for request: Request) {
+        if self.cacheConfig.usagePolicy == .useInsteadOfFetching && isCacheValid {
+            if let value: Response = self.cache.get(for: self.key) {
+                self.state = .succeed(value)
+            }
+            return
+        }
+        
+        if self.cacheConfig.usagePolicy == .useAndThenFetch {
+            if let value = getCacheValueIfPossible() {
+                self.state = .succeed(value)
+            }
+        }
+        
         fetcher(request)
             .sink(
                 receiveCompletion: { (completion: Subscribers.Completion<Error>) in
                     switch completion {
                     case let .failure(error):
                         self.timerCancellables.forEach({ $0.cancel() })
-                        self.state = .failed(error)
+                        if self.cacheConfig.usagePolicy == .useIfFetchFails {
+                            if let value = self.getCacheValueIfPossible() {
+                                self.state = .succeed(value)
+                            } else {
+                                self.state = .failed(error)
+                            }
+                        } else {
+                            self.state = .failed(error)
+                        }
                     case .finished:
                         break
                     }
                 },
                 receiveValue: { (response: Response) in
-                    self.cache.save(response, for: self.key)
-                    NotificationCenter.default.post(
-                        name: self.key.newDataNotificationName,
-                        object: response
-                    )
+                    self.state = .succeed(response)
+                    self.cache.save(response, for: self.key, andTimestamp: Date())
                 }
             )
             .store(in: &cancellables)

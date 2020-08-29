@@ -13,7 +13,7 @@ public final class Mutation<Request, Response>: ObservableObject {
     public typealias State = QueryState<Response>
     public typealias QueryFetcher = (Request) -> AnyPublisher<Response, Error>
     
-    @Published public var state = State.none
+    @Published public var state = State.idle
     private let fetcher: QueryFetcher
     private var cancellables = Set<AnyCancellable>()
     

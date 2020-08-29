@@ -11,7 +11,7 @@ import SwiftUI
 import Combine
 import Pigeon
 
-struct CardDetailView: View {
+struct CardDetailView: View, QueryRenderer {
     @ObservedObject private var card: Query<String, Card>
     
     init(id: String) {
@@ -28,7 +28,19 @@ struct CardDetailView: View {
     }
     
     var body: some View {
-        Text(card.state.value?.name ?? "Loading...")
+       view(for: card.state)
             .navigationBarTitle("Card Detail")
+    }
+    
+    var loadingView: some View {
+        Text("Loading...")
+    }
+    
+    func failureView(for failure: Error) -> some View {
+        EmptyView()
+    }
+    
+    func successView(for response: Card) -> some View {
+        Text(response.name)
     }
 }

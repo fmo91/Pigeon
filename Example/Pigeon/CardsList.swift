@@ -13,6 +13,10 @@ struct CardsList: View {
     @ObservedObject private var cards = Query<Void, [Card]>(
         key: QueryKey(value: "cards"),
         behavior: .startImmediately(()),
+        cacheConfig: QueryCacheConfig(
+            invalidationPolicy: .expiresAfter(100),
+            usagePolicy: .useAndThenFetch
+        ),
         fetcher: {
             GetCardsRequest()
                 .execute()

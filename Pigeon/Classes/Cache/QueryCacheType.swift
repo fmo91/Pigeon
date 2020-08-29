@@ -9,8 +9,13 @@
 import Foundation
 
 public protocol QueryCacheType {
-    func save<T: Codable>(_ value: T, for key: QueryKey)
+    func save<T: Codable>(_ value: T, for key: QueryKey, andTimestamp timestamp: Date)
     func invalidate(for key: QueryKey)
+    func isValueValid(
+        forKey key: QueryKey,
+        timestamp: Date,
+        andInvalidationPolicy invalidationPolicy: QueryCacheConfig.InvalidationPolicy
+    ) -> Bool
     func get<T: Codable>(for key: QueryKey) -> T?
 }
 

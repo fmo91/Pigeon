@@ -23,7 +23,7 @@ public protocol QueryRenderer {
 public extension QueryRenderer {
     func view(for state: QueryState<Response>) -> some View {
         switch state {
-        case .none, .loading:
+        case .idle, .loading:
             return AnyView(loadingView)
         case let .succeed(response):
             return AnyView(successView(for: response))

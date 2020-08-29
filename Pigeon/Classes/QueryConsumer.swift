@@ -10,7 +10,7 @@ import Foundation
 import Combine
 
 extension Query {
-    public final class Consumer: ObservableObject, QueryCacheListener {
+    public final class Consumer: ObservableObject {
         public typealias State = QueryState<Response>
         private let key: QueryKey
         private let query: Query<Request, Response>

@@ -10,7 +10,7 @@ import Foundation
 import Combine
 
 public enum QueryState<Response> {
-    case none
+    case idle
     case loading
     case succeed(Response)
     case failed(Error)

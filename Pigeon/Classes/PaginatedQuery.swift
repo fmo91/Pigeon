@@ -9,7 +9,7 @@
 import Foundation
 import Combine
 
-public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Response: Codable>: ObservableObject, QueryCacheListener, QueryInvalidationListener {
+public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Response: Codable>: ObservableObject, QueryInvalidationListener {
     public enum FetchingBehavior {
         case startWhenRequested
         case startImmediately(Request)
@@ -17,7 +17,7 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
     public typealias State = QueryState<Response>
     public typealias QueryFetcher = (Request, PageIdentifier) -> AnyPublisher<Response, Error>
     
-    @Published private(set) public var state = State.none
+    @Published private(set) public var state = State.idle
     @Published private(set) public var currentPage: PageIdentifier
     public var valuePublisher: AnyPublisher<Response, Never> {
         $state
@@ -45,10 +45,6 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
         self.fetcher = fetcher
         
         start(for: behavior)
-        
-        listenQueryCache(for: key)
-            .assign(to: \.state, on: self)
-            .store(in: &cancellables)
         
         listenQueryInvalidation(for: key)
             .sink { (parameters: QueryInvalidator.TypedParameters<Request>) in
@@ -100,10 +96,6 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
         self.lastRequest = request
         self.currentPage = page
         self.cache.invalidate(for: currentPage.asQueryKey)
-        NotificationCenter.default.post(
-            name: self.currentPage.newDataNotificationName,
-            object: nil
-        )
         state = .loading
         fetcher(request, page)
             .sink(
@@ -116,11 +108,7 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
                     }
                 },
                 receiveValue: { (response: Response) in
-                    NotificationCenter.default.post(
-                        name: self.currentPage.newDataNotificationName,
-                        object: response
-                    )
-                    self.cache.save(response, for: self.currentPage.asQueryKey)
+                    self.cache.save(response, for: self.currentPage.asQueryKey, andTimestamp: Date())
                     self.state = .succeed(response)
                 }
             )
