@@ -1,5 +1,5 @@
 PODS:
-  - Pigeon (0.1.0)
+  - Pigeon (0.1.9)
 
 DEPENDENCIES:
   - Pigeon (from `../`)
@@ -9,7 +9,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Pigeon: 6f90cd65c392289cd087859bf6fcc30ac3a260a1
+  Pigeon: 872bcaf4623d1aa382fd4c2017b1a336111b9f45
 
 PODFILE CHECKSUM: d484b1d7957e4b086f43b3b7c4b05fdc862a7fb2
 
