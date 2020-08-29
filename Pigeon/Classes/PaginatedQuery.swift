@@ -64,13 +64,14 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
     
     public init(
         key: QueryKey,
+        firstPage: PageIdentifier,
         behavior: FetchingBehavior = .startWhenRequested,
         cache: QueryCacheType = QueryCache.global,
         cacheConfig: QueryCacheConfig = .global,
         fetcher: @escaping QueryFetcher
     ) {
         self.key = key
-        self.currentPage = PageIdentifier.first
+        self.currentPage = firstPage
         self.cache = cache
         self.cacheConfig = cacheConfig
         self.fetcher = fetcher
@@ -88,10 +89,10 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
                 switch parameters {
                 case .lastData:
                     if let lastRequest = self.lastRequest {
-                        self.refetchAll(request: lastRequest)
+                        self.refetch(request: lastRequest)
                     }
                 case let .newData(newRequest):
-                    self.refetchAll(request: newRequest)
+                    self.refetch(request: newRequest)
                 }
             }
             .store(in: &cancellables)
@@ -110,7 +111,7 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
             }
             break
         case let .startImmediately(request):
-            refetch(request: request, page: currentPage)
+            refetchPage(request: request, page: currentPage)
         }
     }
     
@@ -136,20 +137,20 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
         }
         
         self.currentPage = self.currentPage.next
-        refetch(request: lastRequest, page: self.currentPage)
+        refetchPage(request: lastRequest, page: self.currentPage)
     }
     
-    public func refetchAll(request: Request) {
+    public func refetch(request: Request) {
         items = []
-        currentPage = .first
+        currentPage = currentPage.first
         refetchCurrent(request: request)
     }
     
     private func refetchCurrent(request: Request) {
-        self.refetch(request: request, page: currentPage)
+        self.refetchPage(request: request, page: currentPage)
     }
     
-    private func refetch(request: Request, page: PageIdentifier) {
+    private func refetchPage(request: Request, page: PageIdentifier) {
         self.lastRequest = request
         self.currentPage = page
         

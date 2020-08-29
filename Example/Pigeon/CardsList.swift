@@ -11,12 +11,20 @@ import Pigeon
 
 struct CardsList: View {
     @ObservedObject private var cards = Query<Void, [Card]>.Consumer(key: QueryKey(value: "cards"))
+    @State private var searchText = "" {
+        didSet {
+            cards.refetch(for: .newData(()))
+        }
+    }
     
     let renderer = CardsListRenderer()
     
     var body: some View {
-        renderer.view(for: cards.state)
-            .navigationBarTitle("Cards")
+        VStack {
+            TextField("Search...", text: $searchText)
+                .padding()
+            renderer.view(for: cards.state)
+        }.navigationBarTitle("Cards")
     }
 }
 

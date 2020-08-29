@@ -9,13 +9,17 @@ import Foundation
 import Combine
 
 /// Type erased QueryType
+/// this type encapsulates the state accessors for an underlying concrete query.
 public final class AnyQuery<Request, Response>: QueryType {
     private let stateGetter: () -> QueryState<Response>
     private let statePublisherGetter: () -> AnyPublisher<QueryState<Response>, Never>
     
+    /// A  state that encapsulates the response type
     public var state: QueryState<Response> {
         return stateGetter()
     }
+    
+    /// A publisher for the internal state value
     public var statePublisher: AnyPublisher<QueryState<Response>, Never> {
         return statePublisherGetter()
     }

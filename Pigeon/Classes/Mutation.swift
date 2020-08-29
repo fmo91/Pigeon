@@ -9,6 +9,11 @@
 import Foundation
 import Combine
 
+/// Mutations are central to Pigeon concepts.
+/// A mutation is a type that encapsulates an operation that could mutate
+/// server data.
+/// As it can mutate server data, it's also responsible for invalidating
+/// current queries.
 public final class Mutation<Request, Response>: ObservableObject {
     public typealias State = QueryState<Response>
     public typealias QueryFetcher = (Request) -> AnyPublisher<Response, Error>
