@@ -68,12 +68,31 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
     private func start(for behavior: FetchingBehavior) {
         switch behavior {
         case .startWhenRequested:
-            if let cachedResponse: Response = self.cache.get(for: self.key.appending(currentPage)) {
-                state = .succeed(cachedResponse)
+            if cacheConfig.usagePolicy == .useInsteadOfFetching
+                || cacheConfig.usagePolicy == .useAndThenFetch {
+                if let cachedResponse: Response = self.getCacheValueIfPossible() {
+                    state = .succeed(cachedResponse)
+                }
             }
             break
         case let .startImmediately(request):
             refetch(request: request, page: currentPage)
+        }
+    }
+    
+    private var isCacheValid: Bool {
+        return self.cache.isValueValid(
+            forKey: self.key,
+            timestamp: Date(),
+            andInvalidationPolicy: self.cacheConfig.invalidationPolicy
+        )
+    }
+    
+    private func getCacheValueIfPossible() -> Response? {
+        if isCacheValid {
+           return self.cache.get(for: self.key.appending(currentPage))
+        } else {
+            return nil
         }
     }
     
@@ -98,21 +117,46 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
     public func refetch(request: Request, page: PageIdentifier) {
         self.lastRequest = request
         self.currentPage = page
-        self.cache.invalidate(for: currentPage.asQueryKey)
-        state = .loading
+        
+        if self.cacheConfig.usagePolicy == .useInsteadOfFetching && isCacheValid {
+            if let value: Response = self.cache.get(for: self.key) {
+                self.state = .succeed(value)
+            }
+            return
+        }
+        
+        if self.cacheConfig.usagePolicy == .useAndThenFetch {
+            if let value = getCacheValueIfPossible() {
+                self.state = .succeed(value)
+            }
+        }
+        
+        if self.cacheConfig.usagePolicy == .useIfFetchFails {
+            state = .loading
+        }
+        
         fetcher(request, page)
             .sink(
                 receiveCompletion: { (completion: Subscribers.Completion<Error>) in
                     switch completion {
                     case let .failure(error):
-                        self.state = .failed(error)
+                        self.timerCancellables.forEach({ $0.cancel() })
+                        if self.cacheConfig.usagePolicy == .useIfFetchFails {
+                            if let value = self.getCacheValueIfPossible() {
+                                self.state = .succeed(value)
+                            } else {
+                                self.state = .failed(error)
+                            }
+                        } else {
+                            self.state = .failed(error)
+                        }
                     case .finished:
                         break
                     }
                 },
                 receiveValue: { (response: Response) in
-                    self.cache.save(response, for: self.currentPage.asQueryKey, andTimestamp: Date())
                     self.state = .succeed(response)
+                    self.cache.save(response, for: self.currentPage.asQueryKey, andTimestamp: Date())
                 }
             )
             .store(in: &cancellables)
