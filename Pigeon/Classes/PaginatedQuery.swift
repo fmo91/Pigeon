@@ -18,13 +18,39 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
     public typealias QueryFetcher = (Request, PageIdentifier) -> AnyPublisher<Response, Error>
     
     @Published private(set) public var items: [Response.Element] = []
-    @Published private(set) public var state = State.idle
+    @Published private var internalState = State.idle
     @Published private(set) public var currentPage: PageIdentifier
-    public var valuePublisher: AnyPublisher<Response, Never> {
-        $state
+    private var internalValuePublisher: AnyPublisher<Response, Never> {
+        $internalState
             .map { $0.value }
             .filter({ $0 != nil })
             .map { $0! }
+            .eraseToAnyPublisher()
+    }
+    public var valuePublisher: AnyPublisher<Response, Never> {
+        statePublisher
+            .map { $0.value }
+            .filter({ $0 != nil })
+            .map { $0! }
+            .eraseToAnyPublisher()
+    }
+    public var state: QueryState<Response> {
+        switch internalState {
+        case .idle:
+            return .idle
+        case .loading:
+            return .loading
+        case let .failed(error):
+            return .failed(error)
+        case .succeed:
+            return .succeed(items as! Response)
+        }
+    }
+    public var statePublisher: AnyPublisher<QueryState<Response>, Never> {
+        $internalState
+            .map { _ -> QueryState<Response> in
+                return self.state
+            }
             .eraseToAnyPublisher()
     }
     private let key: QueryKey
@@ -50,7 +76,7 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
         
         start(for: behavior)
         
-        valuePublisher
+        internalValuePublisher
             .sink { (items) in
                 self.items.append(contentsOf: items)
             }
@@ -78,7 +104,7 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
             if cacheConfig.usagePolicy == .useInsteadOfFetching
                 || cacheConfig.usagePolicy == .useAndThenFetch {
                 if let cachedResponse: Response = self.getCacheValueIfPossible() {
-                    state = .succeed(cachedResponse)
+                    internalState = .succeed(cachedResponse)
                 }
             }
             break
@@ -128,19 +154,19 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
         
         if self.cacheConfig.usagePolicy == .useInsteadOfFetching && isCacheValid {
             if let value: Response = self.cache.get(for: self.key) {
-                self.state = .succeed(value)
+                self.internalState = .succeed(value)
             }
             return
         }
         
         if self.cacheConfig.usagePolicy == .useAndThenFetch {
             if let value = getCacheValueIfPossible() {
-                self.state = .succeed(value)
+                self.internalState = .succeed(value)
             }
         }
         
         if self.cacheConfig.usagePolicy == .useIfFetchFails {
-            state = .loading
+            internalState = .loading
         }
         
         fetcher(request, page)
@@ -151,20 +177,20 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
                         self.timerCancellables.forEach({ $0.cancel() })
                         if self.cacheConfig.usagePolicy == .useIfFetchFails {
                             if let value = self.getCacheValueIfPossible() {
-                                self.state = .succeed(value)
+                                self.internalState = .succeed(value)
                             } else {
-                                self.state = .failed(error)
+                                self.internalState = .failed(error)
                             }
                         } else {
-                            self.state = .failed(error)
+                            self.internalState = .failed(error)
                         }
                     case .finished:
                         break
                     }
                 },
                 receiveValue: { (response: Response) in
-                    self.state = .succeed(response)
-                    self.cache.save(response, for: self.currentPage.asQueryKey, andTimestamp: Date())
+                    self.internalState = .succeed(response)
+                    self.cache.save(response, for: self.key.appending(self.currentPage), andTimestamp: Date())
                 }
             )
             .store(in: &cancellables)
