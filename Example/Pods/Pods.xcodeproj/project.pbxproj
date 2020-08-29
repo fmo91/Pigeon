@@ -28,6 +28,7 @@
 		E48BE0FB1FE4BBB47D75836395C38A0E /* QueryCacheType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5891DC50901D2F38BA3EC9EC2183E293 /* QueryCacheType.swift */; };
 		EC6E962FF9744A6B930D17AD1E125612 /* QueryConsumer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E843D6CB8604CC93F0FAA8331CE7ECF7 /* QueryConsumer.swift */; };
 		FA23007524FAAAA600A83AE0 /* QueryType.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA23007424FAAAA600A83AE0 /* QueryType.swift */; };
+		FA23007724FAB5FB00A83AE0 /* AnyQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA23007624FAB5FB00A83AE0 /* AnyQuery.swift */; };
 		FA31DE7524F9E01500B0D69C /* QueryCacheConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA31DE7424F9E01500B0D69C /* QueryCacheConfig.swift */; };
 		FA81FF2A24F7553D000087E6 /* QueryRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA81FF2924F7553D000087E6 /* QueryRegistry.swift */; };
 		FABE436B24F89EFC00AEED7B /* QueryRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FABE436A24F89EFC00AEED7B /* QueryRenderer.swift */; };
@@ -96,6 +97,7 @@
 		EBF46FDC1A43AA3F055AB20F283B6229 /* Pigeon-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pigeon-umbrella.h"; sourceTree = "<group>"; };
 		F65781FB74B9579F26125431EF325EFA /* Pigeon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Pigeon.release.xcconfig; sourceTree = "<group>"; };
 		FA23007424FAAAA600A83AE0 /* QueryType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryType.swift; sourceTree = "<group>"; };
+		FA23007624FAB5FB00A83AE0 /* AnyQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyQuery.swift; sourceTree = "<group>"; };
 		FA31DE7424F9E01500B0D69C /* QueryCacheConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryCacheConfig.swift; sourceTree = "<group>"; };
 		FA81FF2924F7553D000087E6 /* QueryRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryRegistry.swift; sourceTree = "<group>"; };
 		FABE436A24F89EFC00AEED7B /* QueryRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryRenderer.swift; sourceTree = "<group>"; };
@@ -139,6 +141,7 @@
 				BD0A78292C5563992C99E1E0CB7D0F69 /* Query.swift */,
 				E843D6CB8604CC93F0FAA8331CE7ECF7 /* QueryConsumer.swift */,
 				FA23007424FAAAA600A83AE0 /* QueryType.swift */,
+				FA23007624FAB5FB00A83AE0 /* AnyQuery.swift */,
 				D1D6073B00ED28197FF906F15A83966F /* Cache */,
 				BDC775F96BA18A39F9E20D3B64276F67 /* Pod */,
 				4F7035FD2AE3E9A0DBB9098A2774BD34 /* Support Files */,
@@ -451,6 +454,7 @@
 				FB9F6FB86EFDBE6AFD268FFCC333DF88 /* Mutation.swift in Sources */,
 				FA23007524FAAAA600A83AE0 /* QueryType.swift in Sources */,
 				471DFFDDF231FB4451FFC125F0E0D390 /* PaginatedQuery.swift in Sources */,
+				FA23007724FAB5FB00A83AE0 /* AnyQuery.swift in Sources */,
 				2A7C5FBD8219660D09210A55A2133074 /* PaginatedQueryKey.swift in Sources */,
 				C690B79F16544BB1E600E8AED1688C60 /* Pigeon-dummy.m in Sources */,
 				C41D4975F54AC0F10D161EA651740E7E /* Query.swift in Sources */,

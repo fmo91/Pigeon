@@ -22,6 +22,9 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryTyp
     public typealias QueryFetcher = (Request) -> AnyPublisher<Response, Error>
     
     @Published private(set) public var state = State.idle
+    public var statePublisher: AnyPublisher<QueryState<Response>, Never> {
+        return $state.eraseToAnyPublisher()
+    }
     public var valuePublisher: AnyPublisher<Response, Never> {
         $state
             .map { $0.value }
@@ -67,7 +70,7 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryTyp
             }
             .store(in: &cancellables)
         
-        QueryRegistry.shared.register(self, for: key)
+        QueryRegistry.shared.register(self.eraseToAnyQuery(), for: key)
     }
     
     deinit {

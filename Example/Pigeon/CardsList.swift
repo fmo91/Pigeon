@@ -10,21 +10,7 @@ import SwiftUI
 import Pigeon
 
 struct CardsList: View {
-    @ObservedObject private var cards = PaginatedQuery<Void, NumericPaginatedQueryKey, [Card]>(
-        key: QueryKey(value: "cards"),
-        behavior: .startImmediately(()),
-        cacheConfig: QueryCacheConfig(
-            invalidationPolicy: .expiresAfter(1000),
-            usagePolicy: .useInsteadOfFetching
-        ),
-        fetcher: { request, page in
-            print("Fetching page no. \(page)")
-            return GetCardsRequest()
-                .execute()
-                .map(\.cards)
-                .eraseToAnyPublisher()
-        }
-    )
+    @ObservedObject private var cards = Query<Void, [Card]>.Consumer(key: QueryKey(value: "cards"))
     
     let renderer = CardsListRenderer()
     

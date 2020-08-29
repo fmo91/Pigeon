@@ -10,6 +10,7 @@ import Foundation
 import Combine
 
 public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Response: Codable & Sequence>: ObservableObject, QueryType, QueryInvalidationListener {
+    
     public enum FetchingBehavior {
         case startWhenRequested
         case startImmediately(Request)
@@ -95,7 +96,7 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
             }
             .store(in: &cancellables)
         
-        QueryRegistry.shared.register(self, for: key)
+        QueryRegistry.shared.register(self.eraseToAnyQuery(), for: key)
     }
     
     private func start(for behavior: FetchingBehavior) {
@@ -115,7 +116,7 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
     
     private var isCacheValid: Bool {
         return self.cache.isValueValid(
-            forKey: self.key,
+            forKey: self.key.appending(currentPage),
             timestamp: Date(),
             andInvalidationPolicy: self.cacheConfig.invalidationPolicy
         )
