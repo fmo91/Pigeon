@@ -441,6 +441,18 @@ struct User: Codable, Identifiable {
 
 You can change `QueryCacheType` and `QueryCacheConfig` global data by calling to `setGlobal` on either type.
 
+## Best Practices
+
+You are not forced to mix networking logic with the views. You can always define your queries externally and inject them as a dependency. You can even embed Queries and Mutations in your own view models or `ObservableObject` instances. `Query`, `Consumer` and `PaginatedQuery`  have three interesting properties:
+
+```swift
+var state: QueryState<Response> { get }
+var statePublisher: AnyPublisher<QueryState<Response>, Never> { get }
+var valuePublisher: AnyPublisher<Response, Never>
+```
+
+You can observe `statePublisher` or `valuePublisher`, so you can add abstract your views from the `QueryType` objects, or even create dependent queries. You can  chain queries by listening to changes in their state or success values.
+
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
