@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Pigeon'
-  s.version          = '0.1.14'
+  s.version          = '0.1.15'
   s.swift_versions = ['5.0']
   s.summary          = 'Server state management for UIKit and SwiftUI, heavily inspired by React Query.'
   s.description      = <<-DESC
