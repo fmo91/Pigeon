@@ -232,6 +232,25 @@ struct UsersList: View {
 }
 ```
 
+## Key adapters
+
+There are some times where you need to cache values not only depending on your `Query` type, but also on the parameters of your request. For instance, maybe you want to cache the response for user with id=1 in a separate cache value than user with id=2. That is the problem key adapters solve. Key Adapters are available both in `Query` and in `PaginatedQuery` and are optional.
+Key adapters are sent under the `keyAdapter` parameter for the constructor and are functions with `(QueryKey, Request) -> QueryKey` signature.
+
+```swift
+@ObservedObject private var user = Query<Int, [User]>(
+    key: QueryKey(value: "users"),
+    keyAdapter: { key, id in
+        key.appending(id.description)
+    },
+    behavior: .startImmediately(1),
+    cache: UserDefaultsQueryCache.shared,
+    fetcher: { id in
+        // ...
+    }
+)
+```
+
 ## Paginated Queries
 
 A very frequent scenario when fetching server data is pagination. Pigeon provides a special type of `Query` for this use case: `PaginatedQuery`. `PaginatedQuery` is generic on three types:

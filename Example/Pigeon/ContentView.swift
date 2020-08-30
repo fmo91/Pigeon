@@ -36,11 +36,14 @@ struct ContentView: View {
 }
 
 struct UsersList: View {
-    @ObservedObject private var users = Query<Void, [User]>(
+    @ObservedObject private var users = Query<Int, [User]>(
         key: QueryKey(value: "users"),
-        behavior: .startImmediately(()),
+        keyAdapter: { key, id in
+            key.appending(id.description)
+        },
+        behavior: .startImmediately(1),
         cache: UserDefaultsQueryCache.shared,
-        fetcher: {
+        fetcher: { id in
             URLSession.shared
                 .dataTaskPublisher(for: URL(string: "https://jsonplaceholder.typicode.com/users/")!)
                 .map(\.data)

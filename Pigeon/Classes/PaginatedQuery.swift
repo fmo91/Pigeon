@@ -55,6 +55,7 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
             .eraseToAnyPublisher()
     }
     private let key: QueryKey
+    private let keyAdapter: (QueryKey, Request) -> QueryKey
     private let cache: QueryCacheType
     private let cacheConfig: QueryCacheConfig
     private let fetcher: QueryFetcher
@@ -65,6 +66,7 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
     public init(
         key: QueryKey,
         firstPage: PageIdentifier,
+        keyAdapter: @escaping (QueryKey, Request) -> QueryKey = { key, _ in key },
         behavior: FetchingBehavior = .startWhenRequested,
         cache: QueryCacheType = QueryCache.global,
         cacheConfig: QueryCacheConfig = .global,
@@ -72,6 +74,7 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
     ) {
         self.key = key
         self.currentPage = firstPage
+        self.keyAdapter = keyAdapter
         self.cache = cache
         self.cacheConfig = cacheConfig
         self.fetcher = fetcher
@@ -105,7 +108,7 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
         case .startWhenRequested:
             if cacheConfig.usagePolicy == .useInsteadOfFetching
                 || cacheConfig.usagePolicy == .useAndThenFetch {
-                if let cachedResponse: Response = self.getCacheValueIfPossible() {
+                if let cachedResponse: Response = self.getCacheValueIfPossible(for: self.key) {
                     internalState = .succeed(cachedResponse)
                 }
             }
@@ -115,17 +118,17 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
         }
     }
     
-    private var isCacheValid: Bool {
+    private func isCacheValid(for key: QueryKey) -> Bool {
         return self.cache.isValueValid(
-            forKey: self.key.appending(currentPage),
+            forKey: key.appending(currentPage),
             timestamp: Date(),
             andInvalidationPolicy: self.cacheConfig.invalidationPolicy
         )
     }
     
-    private func getCacheValueIfPossible() -> Response? {
-        if isCacheValid {
-           return self.cache.get(for: self.key.appending(currentPage))
+    private func getCacheValueIfPossible(for key: QueryKey) -> Response? {
+        if isCacheValid(for: key) {
+           return self.cache.get(for: key.appending(currentPage))
         } else {
             return nil
         }
@@ -151,18 +154,20 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
     }
     
     private func refetchPage(request: Request, page: PageIdentifier) {
+        let key = self.keyAdapter(self.key, request)
+        
         self.lastRequest = request
         self.currentPage = page
         
-        if self.cacheConfig.usagePolicy == .useInsteadOfFetching && isCacheValid {
-            if let value: Response = self.cache.get(for: self.key) {
+        if self.cacheConfig.usagePolicy == .useInsteadOfFetching && isCacheValid(for: key) {
+            if let value: Response = self.cache.get(for: key) {
                 self.internalState = .succeed(value)
             }
             return
         }
         
         if self.cacheConfig.usagePolicy == .useAndThenFetch {
-            if let value = getCacheValueIfPossible() {
+            if let value = getCacheValueIfPossible(for: key) {
                 self.internalState = .succeed(value)
             }
         }
@@ -178,7 +183,7 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
                     case let .failure(error):
                         self.timerCancellables.forEach({ $0.cancel() })
                         if self.cacheConfig.usagePolicy == .useIfFetchFails {
-                            if let value = self.getCacheValueIfPossible() {
+                            if let value = self.getCacheValueIfPossible(for: key) {
                                 self.internalState = .succeed(value)
                             } else {
                                 self.internalState = .failed(error)
@@ -192,7 +197,7 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
                 },
                 receiveValue: { (response: Response) in
                     self.internalState = .succeed(response)
-                    self.cache.save(response, for: self.key.appending(self.currentPage), andTimestamp: Date())
+                    self.cache.save(response, for: key.appending(self.currentPage), andTimestamp: Date())
                 }
             )
             .store(in: &cancellables)

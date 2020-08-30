@@ -33,6 +33,7 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryTyp
             .eraseToAnyPublisher()
     }
     private let key: QueryKey
+    private let keyAdapter: (QueryKey, Request) -> QueryKey
     private let pollingBehavior: PollingBehavior
     private let cache: QueryCacheType
     private let cacheConfig: QueryCacheConfig
@@ -43,6 +44,7 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryTyp
     
     public init(
         key: QueryKey,
+        keyAdapter: @escaping (QueryKey, Request) -> QueryKey = { key, _ in key },
         behavior: FetchingBehavior = .startWhenRequested,
         pollingBehavior: PollingBehavior = .noPolling,
         cache: QueryCacheType = QueryCache.global,
@@ -50,6 +52,7 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryTyp
         fetcher: @escaping QueryFetcher
     ) {
         self.key = key
+        self.keyAdapter = keyAdapter
         self.pollingBehavior = pollingBehavior
         self.cache = cache
         self.cacheConfig = cacheConfig
@@ -94,7 +97,7 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryTyp
         case .startWhenRequested:
             if cacheConfig.usagePolicy == .useInsteadOfFetching
                 || cacheConfig.usagePolicy == .useAndThenFetch {
-                if let cachedResponse: Response = self.getCacheValueIfPossible() {
+                if let cachedResponse: Response = self.getCacheValueIfPossible(for: key) {
                     state = .succeed(cachedResponse)
                 }
             }
@@ -119,16 +122,16 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryTyp
         }
     }
     
-    private var isCacheValid: Bool {
+    private func isCacheValid(for key: QueryKey) -> Bool {
         return self.cache.isValueValid(
-            forKey: self.key,
+            forKey: key,
             timestamp: Date(),
             andInvalidationPolicy: self.cacheConfig.invalidationPolicy
         )
     }
     
-    private func getCacheValueIfPossible() -> Response? {
-        if isCacheValid {
+    private func getCacheValueIfPossible(for key: QueryKey) -> Response? {
+        if isCacheValid(for: key) {
            return self.cache.get(for: self.key)
         } else {
             return nil
@@ -136,15 +139,17 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryTyp
     }
     
     private func performFetch(for request: Request) {
-        if self.cacheConfig.usagePolicy == .useInsteadOfFetching && isCacheValid {
-            if let value: Response = self.cache.get(for: self.key) {
+        let key = self.keyAdapter(self.key, request)
+        
+        if self.cacheConfig.usagePolicy == .useInsteadOfFetching && isCacheValid(for: key) {
+            if let value: Response = self.cache.get(for: key) {
                 self.state = .succeed(value)
             }
             return
         }
         
         if self.cacheConfig.usagePolicy == .useAndThenFetch {
-            if let value = getCacheValueIfPossible() {
+            if let value = getCacheValueIfPossible(for: key) {
                 self.state = .succeed(value)
             }
         }
@@ -156,7 +161,7 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryTyp
                     case let .failure(error):
                         self.timerCancellables.forEach({ $0.cancel() })
                         if self.cacheConfig.usagePolicy == .useIfFetchFails {
-                            if let value = self.getCacheValueIfPossible() {
+                            if let value = self.getCacheValueIfPossible(for: key) {
                                 self.state = .succeed(value)
                             } else {
                                 self.state = .failed(error)
@@ -170,7 +175,11 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryTyp
                 },
                 receiveValue: { (response: Response) in
                     self.state = .succeed(response)
-                    self.cache.save(response, for: self.key, andTimestamp: Date())
+                    self.cache.save(
+                        response,
+                        for: key,
+                        andTimestamp: Date()
+                    )
                 }
             )
             .store(in: &cancellables)
