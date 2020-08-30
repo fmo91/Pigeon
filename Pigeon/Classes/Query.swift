@@ -110,7 +110,7 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryTyp
             break
         case let .pollEvery(interval):
             Timer
-                .publish(every: interval, on: .main, in: .defaultRunLoopMode)
+                .publish(every: interval, on: .main, in: RunLoop.Mode.default)
                 .autoconnect()
                 .sink { (_) in
                     self.performFetch(for: request)
