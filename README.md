@@ -4,6 +4,7 @@
 [![Version](https://img.shields.io/cocoapods/v/Pigeon.svg?style=flat)](https://cocoapods.org/pods/Pigeon)
 [![License](https://img.shields.io/cocoapods/l/Pigeon.svg?style=flat)](https://cocoapods.org/pods/Pigeon)
 [![Platform](https://img.shields.io/cocoapods/p/Pigeon.svg?style=flat)](https://cocoapods.org/pods/Pigeon)
+[![Slack](https://img.shields.io/badge/slack-@Pigeon-green.svg?logo=slack)](https://join.slack.com/t/pigeonespacio/shared_invite/zt-h2t3fxec-ZHuhC6WhlKB3ZWh6X89g4g) 
 
 ## Introduction
 
