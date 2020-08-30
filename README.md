@@ -9,8 +9,6 @@
 
 Pigeon is a SwiftUI and UIKit library that relies on Combine to deal with asynchronous data. It is heavily inspired by [React Query](https://react-query.tanstack.com/).
 
-**WARNING: Pigeon is in beta stage right now. This library will surely change in the next couple of weeks.**
-
 ## In a nutshell
 
 With Pigeon you can:
