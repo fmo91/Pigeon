@@ -11,35 +11,45 @@ import SwiftUI
 import Combine
 import Pigeon
 
-struct CardDetailView: View, QueryRenderer {
-    @ObservedObject private var card: Query<String, Card>
+struct CardDetailView: View {
+    @ObservedObject private var card = Query<String, Card>(
+        key: QueryKey(value: "card_detail"),
+        keyAdapter: { key, id in
+            key.appending(id)
+        },
+        cache: UserDefaultsQueryCache.shared,
+        cacheConfig: QueryCacheConfig(
+            invalidationPolicy: .expiresAfter(500),
+            usagePolicy: .useInsteadOfFetching
+        ),
+        fetcher: { id in
+            CardDetailRequest(cardId: id)
+                .execute()
+                .map(\.card)
+                .eraseToAnyPublisher()
+        }
+    )
     private let id: String
+    
+    let renderer = NameRepresentableRenderer<Card>()
     
     init(id: String) {
         self.id = id
-        card = Query<String, Card>(
-            key: QueryKey(value: "card_detail_\(id)"),
-            cacheConfig: QueryCacheConfig(
-                invalidationPolicy: .notExpires,
-                usagePolicy: .useInsteadOfFetching
-            ),
-            fetcher: { id in
-                CardDetailRequest(cardId: id)
-                    .execute()
-                    .map(\.card)
-                    .eraseToAnyPublisher()
-            }
-        )
     }
     
     var body: some View {
-       view(for: card.state)
+        renderer.view(for: card.state)
             .navigationBarTitle("Card Detail")
-            .onAppear {
-                self.card.refetch(request: self.id)
-            }
     }
-    
+}
+
+protocol NameRepresentable {
+    var name: String { get }
+}
+
+extension Card: NameRepresentable {}
+
+struct NameRepresentableRenderer<T: NameRepresentable>: QueryRenderer {
     var loadingView: some View {
         Text("Loading...")
     }
@@ -48,7 +58,7 @@ struct CardDetailView: View, QueryRenderer {
         EmptyView()
     }
     
-    func successView(for response: Card) -> some View {
+    func successView(for response: T) -> some View {
         Text(response.name)
     }
 }

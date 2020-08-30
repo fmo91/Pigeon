@@ -438,6 +438,62 @@ struct User: Codable, Identifiable {
 }
 ```
 
+Please note that you aren't forced to put implement `QueryRenderer` in your `View`. You can always create a different structure for the rendering logic, and make that structure reusable for different contexts. Check this full example:
+
+```swift
+struct CardDetailView: View {
+    @ObservedObject private var card = Query<String, Card>(
+        key: QueryKey(value: "card_detail"),
+        keyAdapter: { key, id in
+            key.appending(id)
+        },
+        cache: UserDefaultsQueryCache.shared,
+        cacheConfig: QueryCacheConfig(
+            invalidationPolicy: .expiresAfter(500),
+            usagePolicy: .useInsteadOfFetching
+        ),
+        fetcher: { id in
+            CardDetailRequest(cardId: id)
+                .execute()
+                .map(\.card)
+                .eraseToAnyPublisher()
+        }
+    )
+    private let id: String
+    
+    let renderer = NameRepresentableRenderer<Card>()
+    
+    init(id: String) {
+        self.id = id
+    }
+    
+    var body: some View {
+        renderer.view(for: card.state)
+            .navigationBarTitle("Card Detail")
+    }
+}
+
+protocol NameRepresentable {
+    var name: String { get }
+}
+
+extension Card: NameRepresentable {}
+
+struct NameRepresentableRenderer<T: NameRepresentable>: QueryRenderer {
+    var loadingView: some View {
+        Text("Loading...")
+    }
+    
+    func failureView(for failure: Error) -> some View {
+        EmptyView()
+    }
+    
+    func successView(for response: T) -> some View {
+        Text(response.name)
+    }
+}
+```
+
 ## Global defaults
 
 You can change `QueryCacheType` and `QueryCacheConfig` global data by calling to `setGlobal` on either type.
