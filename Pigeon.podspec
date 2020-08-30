@@ -9,6 +9,7 @@
 Pod::Spec.new do |s|
   s.name             = 'Pigeon'
   s.version          = '0.1.12'
+  s.swift_versions = ['5.0']
   s.summary          = 'Server state management for UIKit and SwiftUI, heavily inspired by React Query.'
   s.description      = <<-DESC
   Pigeon is a server side state management library that is agnostic on how you fetch your data.
