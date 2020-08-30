@@ -222,7 +222,7 @@ So then you can use it like this:
 
 ```swift
 struct UsersList: View {
-    @ObservedObject var users = QueryConsumer<[User]>(key: .users)
+    @ObservedObject var users = Query<Void, [User]>.Consumer(key: .users)
     
     var body: some View {
         List(users.state.value ?? []) { user in
