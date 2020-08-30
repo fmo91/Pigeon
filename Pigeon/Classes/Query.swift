@@ -132,7 +132,7 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryTyp
     
     private func getCacheValueIfPossible(for key: QueryKey) -> Response? {
         if isCacheValid(for: key) {
-           return self.cache.get(for: self.key)
+           return self.cache.get(for: key)
         } else {
             return nil
         }
