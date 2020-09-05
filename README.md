@@ -76,7 +76,7 @@ struct UsersList: View {
 1. We start by defining a `Codable` structure that will store our server side data. This is not related to `Pigeon` itself, but is still needed for our example to work.
 2. We define a `Query` that will store our array of `User`. `Query` takes two generic parameters: `Request` (`Void` in this example, since the fetch action won't receive any parameters) and `Response` which is the type of our data (`[User]` in this example).
 3. Data is cached by default in Pigeon. The `QueryKey` is a simple wrapper around the `String` that identifies our piece of state.
-4. `Query` also receives a `fetcher`, which is a function that we have to define. `fetcher` takes the `Request` and returns a Combine `Publisher` holding the `Response`. Note that we can put whatever custom login in the `fetcher`. In this case, we use `URLSession` to get an array of `User` from an API.
+4. `Query` also receives a `fetcher`, which is a function that we have to define. `fetcher` takes the `Request` and returns a Combine `Publisher` holding the `Response`. Note that we can put whatever custom logic in the `fetcher`. In this case, we use `URLSession` to get an array of `User` from an API.
 5. `Query` contains a state, that is either: `idle` (if it just starts), `loading` (if the fetcher is running), `failed` (which also contains an `Error`), or `succeed` (which also contains the `Response`). `value` is just a convenience property that returns a `Response` in case it exists, or `nil` otherwise.
 
 ```swift
