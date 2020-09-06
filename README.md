@@ -520,12 +520,22 @@ Pigeon works with SwiftUI and UIKit as well. As it has a dependency in Combine, 
 
 ## Installation
 
+### Using Cocoapods
+
 Pigeon is available through [CocoaPods](https://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 
 ```ruby
 pod 'Pigeon'
 ```
+
+### Using Swift Package Manager
+
+Pigeon is also available through Swift Package Manager. To install it:
+
+1. In Xcode, open File > Swift Packages > Add Package Dependency...
+2. In the window that opens, paste `https://github.com/fmo91/Pigeon.git` into the package repository URL text field.
+3. Click next and accept the defaults.
 
 ## Author
 
