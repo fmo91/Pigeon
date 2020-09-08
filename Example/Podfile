@@ -2,6 +2,7 @@ use_frameworks!
 
 target 'Pigeon_Example' do
   pod 'Pigeon', :path => '../'
+  pod 'SwiftLint'
 
   target 'Pigeon_Tests' do
     inherit! :search_paths

@@ -18,6 +18,7 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryTyp
         case noPolling
         case pollEvery(TimeInterval)
     }
+    var id: Int?
     public typealias State = QueryState<Response>
     public typealias QueryFetcher = (Request) -> AnyPublisher<Response, Error>
     

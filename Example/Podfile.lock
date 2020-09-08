@@ -1,16 +1,23 @@
 PODS:
-  - Pigeon (0.1.9)
+  - Pigeon (0.1.16)
+  - SwiftLint (0.40.1)
 
 DEPENDENCIES:
   - Pigeon (from `../`)
+  - SwiftLint
+
+SPEC REPOS:
+  trunk:
+    - SwiftLint
 
 EXTERNAL SOURCES:
   Pigeon:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Pigeon: 872bcaf4623d1aa382fd4c2017b1a336111b9f45
+  Pigeon: 7242eda51588d3b432c0bd7b99fa1cdca378651e
+  SwiftLint: bbfed21bf4451dcbd0f5cdbee44a18e06cf91b12
 
-PODFILE CHECKSUM: d484b1d7957e4b086f43b3b7c4b05fdc862a7fb2
+PODFILE CHECKSUM: b7cdd163d951228552f5b05d1376dbc82f98671a
 
 COCOAPODS: 1.9.3
