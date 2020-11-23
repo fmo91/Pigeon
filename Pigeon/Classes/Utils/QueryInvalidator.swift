@@ -41,6 +41,8 @@ public struct QueryInvalidator {
         }
     }
     
+    public init() {}
+    
     public func invalidateQuery(for key: QueryKey, with parameters: Parameters) {
         NotificationCenter.default.post(
             name: key.invalidationNotificationName,
