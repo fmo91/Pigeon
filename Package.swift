@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "Pigeon",
-    platforms: [.iOS(.v13), .macOS(.v10_15)],
+	platforms: [.iOS(.v13), .macOS(.v10_15), .watchOS(.v6)],
     products: [
         .library(
             name: "Pigeon",
