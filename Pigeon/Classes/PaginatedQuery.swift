@@ -45,8 +45,7 @@ public final class PaginatedQuery< Request,
             if let items = items as? Response {
                 return .succeed(items)
             } else {
-                //draw detai error
-                return .failed(CastError.castFail)
+                return .failed(ItemError.castFail)
             }
         }
     }
@@ -206,7 +205,6 @@ public final class PaginatedQuery< Request,
     }
 }
 
-// error 書く
-enum CastError: Error {
+enum ItemError: Error {
     case castFail
 }
