@@ -11,7 +11,6 @@ import Combine
 
 extension Query {
     public final class Consumer: ObservableObject, QueryType {
-        public typealias State = QueryState<Response>
         private let key: QueryKey
         private let query: AnyQuery<Request, Response>
         public var state: State { query.state }
@@ -20,9 +19,7 @@ extension Query {
         }
         public var valuePublisher: AnyPublisher<Response, Never> {
             query.statePublisher
-                .map { $0.value }
-                .filter({ $0 != nil })
-                .map { $0! }
+                .compactMap { $0.value }
                 .eraseToAnyPublisher()
         }
         private var cancellables = Set<AnyCancellable>()

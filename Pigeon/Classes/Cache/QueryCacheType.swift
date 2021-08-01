@@ -26,7 +26,7 @@ public struct QueryCache {
         self.wrappedCache = wrappedCache
     }
     
-    private(set) public static var global: QueryCacheType = inMemory.wrappedCache
+    public private(set) static var global: QueryCacheType = inMemory.wrappedCache
     public static func setGlobal(_ wrapper: QueryCache) {
         QueryCache.global = wrapper.wrappedCache
     }

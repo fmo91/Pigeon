@@ -19,7 +19,7 @@ struct ContentView: View {
             invalidationPolicy: .expiresAfter(1000),
             usagePolicy: .useInsteadOfFetching
         ),
-        fetcher: { request, page in
+        fetcher: { _, page in
             print("Fetching page no. \(page)")
             return GetCardsRequest()
                 .execute()
@@ -43,13 +43,18 @@ struct UsersList: View {
         },
         behavior: .startImmediately(1),
         cache: UserDefaultsQueryCache.shared,
-        fetcher: { id in
-            URLSession.shared
-                .dataTaskPublisher(for: URL(string: "https://jsonplaceholder.typicode.com/users/")!)
-                .map(\.data)
-                .decode(type: [User].self, decoder: JSONDecoder())
-                .receive(on: DispatchQueue.main)
-                .eraseToAnyPublisher()
+        fetcher: { _ in
+            let url = URL(string: "https://jsonplaceholder.typicode.com/users/")
+            if let url = url {
+                return URLSession.shared
+                    .dataTaskPublisher(for: url)
+                    .map(\.data)
+                    .decode(type: [User].self, decoder: JSONDecoder())
+                    .receive(on: DispatchQueue.main)
+                    .eraseToAnyPublisher()
+            } else {
+                return AnyPublisher<[User], Error>(Empty<[User], Error>())
+            }
         }
     )
     

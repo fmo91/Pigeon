@@ -22,15 +22,13 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryTyp
     public typealias State = QueryState<Response>
     public typealias QueryFetcher = (Request) -> AnyPublisher<Response, Error>
     
-    @Published private(set) public var state = State.idle
+    @Published public private(set) var state = State.idle
     public var statePublisher: AnyPublisher<QueryState<Response>, Never> {
         return $state.eraseToAnyPublisher()
     }
     public var valuePublisher: AnyPublisher<Response, Never> {
         $state
-            .map { $0.value }
-            .filter({ $0 != nil })
-            .map { $0! }
+            .compactMap { $0.value }
             .eraseToAnyPublisher()
     }
     private let key: QueryKey
@@ -102,7 +100,6 @@ public final class Query<Request, Response: Codable>: ObservableObject, QueryTyp
                     state = .succeed(cachedResponse)
                 }
             }
-            break
         case let .startImmediately(request):
             refetch(request: request)
         }

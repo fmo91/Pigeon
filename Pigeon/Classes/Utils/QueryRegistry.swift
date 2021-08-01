@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 final class QueryRegistry {
     private var queries: [QueryKey: Any] = [:]
@@ -25,6 +26,15 @@ final class QueryRegistry {
     }
     
     func resolve<Request, Response>(for key: QueryKey) -> AnyQuery<Request, Response> {
-        return queries[key] as! AnyQuery<Request, Response>
+        //let queries: AnyQuery<Request, Response>
+        if let queries = queries[key] as? AnyQuery<Request, Response> {
+            return queries
+        }
+        //todo fix stateGetter context
+        return AnyQuery<Request, Response>(stateGetter: { QueryState.loading },
+                                           statePublisherGetter: {
+                                            AnyPublisher<QueryState<Response>, Never>(
+                                                Empty<QueryState<Response>, Never>())
+                                           })
     }
 }

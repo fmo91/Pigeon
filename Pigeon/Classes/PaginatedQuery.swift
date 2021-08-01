@@ -9,7 +9,9 @@
 import Foundation
 import Combine
 
-public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Response: Codable & Sequence>: ObservableObject, QueryType, QueryInvalidationListener {
+public final class PaginatedQuery< Request,
+                                 PageIdentifier: PaginatedQueryKey,
+                                 Response: Codable & Sequence>: ObservableObject, QueryType, QueryInvalidationListener {
     
     public enum FetchingBehavior {
         case startWhenRequested
@@ -18,21 +20,17 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
     public typealias State = QueryState<Response>
     public typealias QueryFetcher = (Request, PageIdentifier) -> AnyPublisher<Response, Error>
     
-    @Published private(set) public var items: [Response.Element] = []
+    @Published public private(set) var items: [Response.Element] = []
     @Published private var internalState = State.idle
-    @Published private(set) public var currentPage: PageIdentifier
+    @Published public private(set) var currentPage: PageIdentifier
     private var internalValuePublisher: AnyPublisher<Response, Never> {
         $internalState
-            .map { $0.value }
-            .filter({ $0 != nil })
-            .map { $0! }
+            .compactMap { $0.value }
             .eraseToAnyPublisher()
     }
     public var valuePublisher: AnyPublisher<Response, Never> {
         statePublisher
-            .map { $0.value }
-            .filter({ $0 != nil })
-            .map { $0! }
+            .compactMap { $0.value }
             .eraseToAnyPublisher()
     }
     public var state: QueryState<Response> {
@@ -44,7 +42,11 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
         case let .failed(error):
             return .failed(error)
         case .succeed:
-            return .succeed(items as! Response)
+            if let items = items as? Response {
+                return .succeed(items)
+            } else {
+                return .failed(ItemError.castFail)
+            }
         }
     }
     public var statePublisher: AnyPublisher<QueryState<Response>, Never> {
@@ -112,7 +114,6 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
                     internalState = .succeed(cachedResponse)
                 }
             }
-            break
         case let .startImmediately(request):
             refetchPage(request: request, page: currentPage)
         }
@@ -202,4 +203,8 @@ public final class PaginatedQuery<Request, PageIdentifier: PaginatedQueryKey, Re
             )
             .store(in: &cancellables)
     }
+}
+
+enum ItemError: Error {
+    case castFail
 }
